@@ -53,11 +53,11 @@ unsafe public class Emulator
 
     while (_running)
     {
-      if (!FastForward && 
-          frameTimer.Elapsed.TotalMilliseconds < FRAME_INTERVAL_MS)
-        continue;
+      // if (!FastForward && 
+      //     frameTimer.Elapsed.TotalMilliseconds < FRAME_INTERVAL_MS)
+      //   continue;
 
-      frameTimer.Restart();
+      // frameTimer.Restart();
       frameCounter++;
 
       var scanlines = _video.ScanlinesPerFrame;
@@ -85,15 +85,16 @@ unsafe public class Emulator
         SaveSnapshot(state);
         _saveRequested = false;
       }
-      else if (frameCounter >= FRAMES_PER_REWIND)
+      else if (frameCounter % FRAMES_PER_REWIND == 0)
       {
         var state = cpu.SaveState();
         _history.Push(state);
-        frameCounter = 0;
+        //frameCounter = 0;
       }
     }
-
+    var seconds = frameTimer.Elapsed.TotalMilliseconds / 1000;
     _audio.Stop();
+    throw new System.Exception($"{frameCounter} in {seconds} seconds ({frameCounter/seconds} FPS)");
   }
 
   public void Stop() => _running = false;
